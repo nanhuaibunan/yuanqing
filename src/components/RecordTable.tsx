@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { useOrderStore } from '../hooks/useOrderStore';
+import { EditModal } from './EditModal';
+import { OrderRecord } from '../types';
 
 export function RecordTable() {
   const records = useOrderStore((state) => state.getFilteredRecords());
   const deleteRecord = useOrderStore((state) => state.deleteRecord);
+  const updateRecord = useOrderStore((state) => state.updateRecord);
+  const [editingRecord, setEditingRecord] = useState<OrderRecord | null>(null);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-6">
@@ -43,18 +48,34 @@ export function RecordTable() {
                   <td className="px-3 py-2 text-right whitespace-nowrap">{record.tuanChou.toFixed(2)}</td>
                   <td className="px-3 py-2 text-right whitespace-nowrap">{record.peiChou.toFixed(2)}</td>
                   <td className="px-3 py-2 text-center whitespace-nowrap">
-                    <button
-                      onClick={() => deleteRecord(record.id)}
-                      className="text-red-500 hover:text-red-700 transition-colors text-sm"
-                    >
-                      🗑️ 删除
-                    </button>
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        onClick={() => setEditingRecord(record)}
+                        className="text-blue-500 hover:text-blue-700 transition-colors text-sm"
+                      >
+                        ✏️ 编辑
+                      </button>
+                      <button
+                        onClick={() => deleteRecord(record.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors text-sm"
+                      >
+                        🗑️ 删除
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {editingRecord && (
+        <EditModal
+          record={editingRecord}
+          onUpdate={updateRecord}
+          onClose={() => setEditingRecord(null)}
+        />
       )}
     </div>
   );

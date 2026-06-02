@@ -6,6 +6,7 @@ interface OrderStore {
   records: OrderRecord[];
   dateRange: DateRange;
   addRecord: (record: Omit<OrderRecord, 'id'>) => void;
+  updateRecord: (id: string, record: Partial<OrderRecord>) => void;
   deleteRecord: (id: string) => void;
   setDateRange: (range: DateRange) => void;
   getFilteredRecords: () => OrderRecord[];
@@ -26,6 +27,11 @@ export const useOrderStore = create<OrderStore>()(
         },
         addRecord: (record) => set((state) => ({
           records: [...state.records, { ...record, id: crypto.randomUUID() }],
+        })),
+        updateRecord: (id, record) => set((state) => ({
+          records: state.records.map((r) =>
+            r.id === id ? { ...r, ...record } : r
+          ),
         })),
         deleteRecord: (id) => set((state) => ({
           records: state.records.filter((r) => r.id !== id),
